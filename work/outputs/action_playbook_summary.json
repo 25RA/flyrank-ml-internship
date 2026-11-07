@@ -1,0 +1,17 @@
+{
+  "total_catalog_size": 30000,
+  "action_mix": {
+    "monitor": 17148,
+    "refresh_and_review_ctr": 9759,
+    "editorial_refresh": 3041,
+    "expand_and_refresh": 52
+  },
+  "reason_mix": {
+    "general_monitoring": 17148,
+    "low_ctr_visible_page": 9759,
+    "stale_visible_page": 3041,
+    "thin_visible_page": 52
+  },
+  "top_50_precision": 0.4,
+  "top_20_precision": 0.4
+}
