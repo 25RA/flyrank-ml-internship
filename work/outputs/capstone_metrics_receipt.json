@@ -1,0 +1,21 @@
+{
+  "project": "FlyRank Content Opportunity & Refresh Prioritization",
+  "lane": "Refresh / Content Opportunity Scoring",
+  "dataset": {
+    "source": "content_refresh_anonymized.csv",
+    "rows": 30000,
+    "clients": 32,
+    "base_rate": 0.5420666666666667
+  },
+  "evaluation_split": "GroupShuffleSplit (Holdout on 7 unseen clients)",
+  "metrics": {
+    "base_rate_test": 0.516514406184118,
+    "heuristic_baseline_p50": 0.16,
+    "heuristic_baseline_p100": 0.2,
+    "decision_tree_p50": 0.56,
+    "decision_tree_p100": 0.56,
+    "decision_tree_auc": 0.5658920661287772,
+    "absolute_lift_p50": 0.4
+  },
+  "champion_model": "DecisionTree (max_depth=3, random_state=42)"
+}

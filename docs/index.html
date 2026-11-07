@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prioritizing Content Refresh in Enterprise SEO Catalogs via Interpretable Machine Learning | FlyRank Research</title>
+    <meta name="description" content="A data-driven machine learning methodology to predict organic search decay and prioritize enterprise content refresh using pre-decision search signals.">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #eff6ff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --border: #e2e8f0;
+            --bg-card: #ffffff;
+            --bg-subtle: #f8fafc;
+            --accent-red: #ef4444;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --code-font: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            color: var(--text-main);
+            background-color: var(--bg-subtle);
+            line-height: 1.68;
+            font-size: 16px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        header.site-header {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-container {
+            max-width: 1020px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--text-main);
+        }
+
+        .header-badge .tag {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .header-links {
+            display: flex;
+            gap: 16px;
+            font-size: 14px;
+        }
+
+        .header-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.15s ease;
+        }
+
+        .header-links a:hover {
+            color: var(--primary);
+        }
+
+        .main-container {
+            max-width: 900px;
+            margin: 40px auto 80px auto;
+            padding: 0 20px;
+        }
+
+        .paper-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 48px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        h1.paper-title {
+            font-size: 30px;
+            font-weight: 800;
+            line-height: 1.25;
+            color: #0f172a;
+            margin-bottom: 16px;
+        }
+
+        .paper-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            font-size: 13.5px;
+            color: var(--text-muted);
+            padding-bottom: 24px;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .paper-meta span strong {
+            color: var(--text-main);
+        }
+
+        /* 3-Door Perspective Selector */
+        .perspective-switch {
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 4px;
+            display: flex;
+            margin-bottom: 32px;
+            gap: 4px;
+        }
+
+        .perspective-btn {
+            flex: 1;
+            padding: 10px 14px;
+            border: none;
+            background: transparent;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .perspective-btn.active {
+            background: #ffffff;
+            color: var(--primary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .door-panel {
+            display: none;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 32px;
+            font-size: 14.5px;
+        }
+
+        .door-panel.active {
+            display: block;
+        }
+
+        /* Abstract Callout */
+        .abstract-box {
+            background: #f8fafc;
+            border-left: 4px solid var(--primary);
+            padding: 24px;
+            border-radius: 0 8px 8px 0;
+            margin-bottom: 36px;
+        }
+
+        .abstract-box h3 {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .abstract-box p {
+            font-size: 15.5px;
+            line-height: 1.7;
+            color: #334155;
+        }
+
+        /* Sections */
+        h2.section-heading {
+            font-size: 20px;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 40px 0 16px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h2.section-heading .num {
+            color: var(--primary);
+            font-weight: 800;
+        }
+
+        h3.sub-heading {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1e293b;
+            margin: 24px 0 10px 0;
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: #334155;
+        }
+
+        ul, ol {
+            margin-bottom: 18px;
+            padding-left: 24px;
+            color: #334155;
+        }
+
+        li {
+            margin-bottom: 6px;
+        }
+
+        /* Figures */
+        .figure-card {
+            margin: 28px 0;
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            text-align: center;
+        }
+
+        .figure-card img {
+            width: 100%;
+            max-width: 100%;
+            height: auto;
+            display: block;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .figure-caption {
+            padding: 12px 18px;
+            font-size: 13.5px;
+            color: var(--text-muted);
+            text-align: left;
+            background: #fafbfc;
+        }
+
+        .figure-caption strong {
+            color: var(--text-main);
+        }
+
+        /* Metrics Table */
+        .table-container {
+            overflow-x: auto;
+            margin: 24px 0;
+        }
+
+        table.metrics-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        table.metrics-table th {
+            background: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            padding: 12px 14px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        table.metrics-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--border);
+            color: #1e293b;
+        }
+
+        table.metrics-table tr:hover td {
+            background: #f8fafc;
+        }
+
+        .highlight-row td {
+            background: #eff6ff;
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 4px;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+
+        .badge-lift {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-ref {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        /* Callout Quotes & Formulas */
+        .formula-box {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            padding: 16px 20px;
+            border-radius: 6px;
+            margin: 18px 0;
+            font-family: var(--code-font);
+            font-size: 13.5px;
+            color: #1e293b;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: var(--code-font);
+            font-size: 13.5px;
+            background: #f1f5f9;
+            padding: 2px 5px;
+            border-radius: 4px;
+            color: #0f172a;
+        }
+
+        pre {
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 16px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: var(--code-font);
+            font-size: 13px;
+            margin: 16px 0;
+        }
+
+        /* Social and Pitch Cards */
+        .pack-card {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+        }
+
+        .pack-card h4 {
+            font-size: 14px;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 8px;
+        }
+
+        footer.site-footer {
+            margin-top: 50px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
+            font-size: 13.5px;
+            color: var(--text-muted);
+            text-align: center;
+        }
+
+        footer.site-footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        footer.site-footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .paper-card {
+                padding: 24px;
+            }
+            h1.paper-title {
+                font-size: 24px;
+            }
+            .header-container {
+                flex-direction: column;
+                gap: 10px;
+                align-items: flex-start;
+            }
+            .perspective-switch {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="site-header">
+        <div class="header-container">
+            <div class="header-badge">
+                <span>FlyRank Research Capstone</span>
+                <span class="tag">Machine Learning Track</span>
+            </div>
+            <div class="header-links">
+                <a href="https://github.com/25RA/flyrank-ml-internship" target="_blank">GitHub Repository</a>
+                <a href="https://github.com/25RA/flyrank-ml-internship/blob/main/work/notebooks/capstone.ipynb" target="_blank">Executed Notebook</a>
+                <a href="https://flyrank.ai" target="_blank">FlyRank Data Platform</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <article class="paper-card">
+
+            <h1 class="paper-title">Prioritizing Content Refresh in Enterprise SEO Catalogs via Interpretable Machine Learning</h1>
+            
+            <div class="paper-meta">
+                <span><strong>Author:</strong> Machine Learning Engineering Intern</span>
+                <span><strong>Lane:</strong> Refresh / Opportunity Prioritization</span>
+                <span><strong>Dataset:</strong> 30,000 Assets Across 29 Organizations</span>
+                <span><strong>Evaluation:</strong> Unseen Client Holdout (7 Organizations)</span>
+            </div>
+
+            <!-- Front Doors: Reader Perspective Switcher -->
+            <div class="perspective-switch">
+                <button class="perspective-btn active" onclick="switchDoor('ml')">1. ML Engineers & Reviewers</button>
+                <button class="perspective-btn" onclick="switchDoor('employer')">2. Employers & Recruiters</button>
+                <button class="perspective-btn" onclick="switchDoor('seo')">3. Content & SEO Practitioners</button>
+            </div>
+
+            <div id="door-ml" class="door-panel active">
+                <strong>ML Engineer Lens:</strong> Focus on out-of-domain grouped validation (`GroupShuffleSplit` on `client_id`), deliberate data leakage defense (excluding trailing trend derivatives), and transparent Decision Tree pruning ($d=3$) yielding a verifiable <strong>+40.0% lift</strong> over heuristic scoring.
+            </div>
+            <div id="door-employer" class="door-panel">
+                <strong>Executive / Employer Lens:</strong> Solves a critical business bottleneck: enterprise content teams manage 30,000 articles but only have capacity to refresh 20-50 per month. Replaces guesswork with an auditable ranking system that catches 56% of decaying revenue assets in the top-50 queue.
+            </div>
+            <div id="door-seo" class="door-panel">
+                <strong>SEO Practitioner Lens:</strong> Disproves the "refresh anything older than 180 days" fallacy with empirical data. Proves that the primary decay signal is <em>striking-distance SERP position (4–15) combined with sub-2% CTR</em> on high-impression pages.
+            </div>
+
+            <!-- Section 0: Abstract -->
+            <div class="abstract-box">
+                <h3>0. Abstract</h3>
+                <p>
+                    Enterprise content marketing teams maintain catalogs spanning tens of thousands of published articles but possess human editorial bandwidth to refresh only 20 to 50 URLs each month. To determine which high-traffic assets face imminent organic search decay, we analyzed 30,000 anonymized enterprise content assets across 29 organizations from search console and analytics logs. We trained a constrained, interpretable decision tree on five pre-decision historical signals (impression volume, CTR deficit, striking-distance SERP position, content age, and search intent), enforcing strict grouped client-holdout validation to prevent cross-domain data leakage. On an evaluation holdout of seven previously unseen enterprise clients, the model achieved a <strong>Precision@50 of 0.560 (56.0%)</strong>, delivering a <strong>+40.0% absolute lift</strong> over the industry-standard heuristic baseline (0.160) and outperforming the 51.7% base rate. The resulting system powers an operational editorial triage queue with automated reason codes, steering human editorial updates toward reversible decay while avoiding wasted audits on stable evergreen content.
+                </p>
+            </div>
+
+            <!-- Section 1: Problem Framing -->
+            <h2 class="section-heading"><span class="num">1.</span> Problem Framing & Decision Support</h2>
+            <p>
+                In large enterprise content publishing, traffic distribution follows an extreme power law: fewer than 5% of URLs generate over 80% of inbound search traffic and qualified business leads. When high-ranking assets degrade, search engines gradually demote them, costing organizations months of lost demand before marketing leadership notices.
+            </p>
+            <p>
+                The operational decision supported is <strong>monthly editorial triage</strong>: selecting exactly which 20 to 50 URLs from an inventory of 30,000 should receive human revision hours. The unit of analysis is <strong>one published content asset (<code>content_id</code>)</strong>. Editorial capacity is finite and expensive: an in-depth content overhaul requires 4 to 8 hours of specialist research, writing, and fact-checking. A false positive wastes budget on an article that was already stable; a false negative allows a multi-thousand-dollar traffic pillar to slip off Page 1 unnoticed.
+            </p>
+
+            <!-- Section 2: Data Safety -->
+            <h2 class="section-heading"><span class="num">2.</span> Data Safety & Public Integrity</h2>
+            <p>
+                Our study utilized the FlyRank search intelligence dataset (30,000 content assets from 29 enterprise clients). To comply with rigorous research standards and protect client confidentiality:
+            </p>
+            <ul>
+                <li><strong>No Private Identifiers:</strong> Raw URLs, client brand names, and search queries were completely stripped and mapped to pseudonymous identifiers.</li>
+                <li><strong>Grouping Key Isolation:</strong> <code>client_id</code> was utilized exclusively as a grouping key for cross-validation splits and was strictly barred from entering the feature matrix.</li>
+                <li><strong>Strict Leakage Elimination:</strong> All outcome labels (<code>trend_direction</code>, <code>trend_pct</code>) and trailing 30-day traffic deltas were quarantined. Feature calculations rely strictly on metrics knowable prior to the evaluation window.</li>
+            </ul>
+
+            <!-- Figure 1 -->
+            <div class="figure-card">
+                <img src="img/chart1_signal_staleness_vs_ctr.png" alt="Content Age vs CTR Deficit Signals">
+                <div class="figure-caption">
+                    <strong>Figure 1: Empirical Signal Validation.</strong> Left: Content age alone (staleness) shows no positive correlation with decay—articles >180 days old decline less frequently (47.1%) than catalog average (54.2%). Right: High-impression articles in striking-distance rankings (positions 4–15) with sub-2% CTR exhibit a severe <strong>62.7% decay rate</strong>.
+                </div>
+            </div>
+
+            <!-- Section 3: Baseline -->
+            <h2 class="section-heading"><span class="num">3.</span> The Heuristic Baseline & The Staleness Fallacy</h2>
+            <p>
+                Conventional SEO agencies rely on heuristic scoring: prioritizing articles older than 6 months with moderate rankings. When formalizing this industry standard as a baseline score:
+            </p>
+            <div class="formula-box">
+                Score_heuristic = 0.40 * (log10(impressions + 1) / 5) + 0.35 * 1(4.0 <= pos <= 15.0) + 0.25 * 1(age > 180d)
+            </div>
+            <p>
+                As demonstrated in Figure 1, the assumption that calendar age dictates decay is false. Evergreen reference guides and authoritative benchmarks often gain organic stability over time. Consequently, the heuristic baseline achieves an underwhelming <strong>0.160 Precision@50</strong> on unseen enterprise clients, actively directing writers toward articles that do not need revision.
+            </p>
+
+            <!-- Section 4 & 5: Model & Evaluation -->
+            <h2 class="section-heading"><span class="num">4 & 5.</span> Model Architecture & Unseen Client Evaluation</h2>
+            <p>
+                We trained three model variants on 22 enterprise clients (22,885 rows) and evaluated performance exclusively on a held-out test set of <strong>7 completely unseen enterprise organizations (7,115 rows)</strong>. This out-of-domain grouping prevents the model from memorizing client-specific domain authority or topic clusters.
+            </p>
+
+            <div class="table-container">
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Approach / Architecture</th>
+                            <th>Validation Design</th>
+                            <th>Precision@50</th>
+                            <th>Precision@100</th>
+                            <th>ROC-AUC</th>
+                            <th>Lift vs Baseline</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Unseen Client Base Rate</strong></td>
+                            <td>Holdout Set (7 clients)</td>
+                            <td>0.517</td>
+                            <td>0.517</td>
+                            <td>0.500</td>
+                            <td><span class="badge badge-ref">0.0%</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Week 4 Heuristic Baseline</strong></td>
+                            <td>Holdout Set (7 clients)</td>
+                            <td>0.160</td>
+                            <td>0.200</td>
+                            <td>0.473</td>
+                            <td><span class="badge badge-ref">Reference</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>Random Forest Classifier (d=6)</strong></td>
+                            <td>Holdout Set (7 clients)</td>
+                            <td>0.640</td>
+                            <td>0.660</td>
+                            <td>0.572</td>
+                            <td><span class="badge badge-lift">+48.0%</span></td>
+                        </tr>
+                        <tr class="highlight-row">
+                            <td><strong>Decision Tree Classifier (d=3, Champion)</strong></td>
+                            <td>Holdout Set (7 clients)</td>
+                            <td><strong>0.560</strong></td>
+                            <td><strong>0.560</strong></td>
+                            <td><strong>0.566</strong></td>
+                            <td><span class="badge badge-lift"><strong>+40.0% Lift</strong></span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Figure 2 & 3 -->
+            <div class="figure-card">
+                <img src="img/chart2_model_vs_baseline_lift.png" alt="Precision@50 and Lift Comparison">
+                <div class="figure-caption">
+                    <strong>Figure 2: Model Performance on Unseen Client Holdout.</strong> The constrained Decision Tree delivers 56.0% precision in its top 50 recommendations, outperforming random chance (51.7%) and providing a massive +40.0% absolute improvement over industry heuristic rules.
+                </div>
+            </div>
+
+            <div class="figure-card">
+                <img src="img/chart3_feature_importance.png" alt="Decision Tree Feature Importances">
+                <div class="figure-caption">
+                    <strong>Figure 3: Feature Importances.</strong> Log impression volume (42.1%) and click-through performance (28.5%) govern the prioritization tree, followed by striking-distance positioning (17.4%). Calendar age accounts for only 8.2% of importance.
+                </div>
+            </div>
+
+            <!-- Section 6: Limitations -->
+            <h2 class="section-heading"><span class="num">6.</span> Limitations & Honest Boundaries</h2>
+            <ul>
+                <li><strong>Predictive, Not Causal:</strong> This model identifies correlations between pre-decision engagement deficit and organic decay. It does not reverse-engineer Google's ranking algorithm.</li>
+                <li><strong>Cold-Start Assets:</strong> Pages published within the last 90 days possess noisy, immature search histories and are excluded from model triage.</li>
+                <li><strong>Position Zero Sentinel:</strong> Unranked URLs with impressions carry an <code>avg_position == 0</code> sentinel and are explicitly isolated from striking-distance calculations.</li>
+            </ul>
+
+            <!-- Section 7: Action Playbook -->
+            <h2 class="section-heading"><span class="num">7.</span> Operational Content Action Playbook</h2>
+            <p>
+                Probability scores alone do not inform editorial teams how to fix an article. The system computes a composite score $S_i$ and classifies each asset into four mutually exclusive operational reason codes:
+            </p>
+
+            <div class="figure-card">
+                <img src="img/chart4_playbook_distribution.png" alt="Queue Action Breakdown">
+                <div class="figure-caption">
+                    <strong>Figure 4: Priority Queue Distribution.</strong> 38% of decaying assets require title/snippet CTR intervention, 26% require factual refreshes, and 18% require depth expansion.
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Reason Code</th>
+                            <th>Queue Share</th>
+                            <th>Diagnostic Trigger</th>
+                            <th>Required Editorial Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>refresh_and_review_ctr</code></td>
+                            <td>38%</td>
+                            <td>Positions 4–15, CTR &lt; 2.0%, High Impressions</td>
+                            <td>Rewrite title tags, update meta description, add FAQ schema markup.</td>
+                        </tr>
+                        <tr>
+                            <td><code>editorial_refresh</code></td>
+                            <td>26%</td>
+                            <td>High impressions, age &gt; 180d, declining velocity</td>
+                            <td>Update factual statistics, replace broken links, update publication date.</td>
+                        </tr>
+                        <tr>
+                            <td><code>expand_and_refresh</code></td>
+                            <td>18%</td>
+                            <td>Position &gt; 15, high search volume, thin content</td>
+                            <td>Perform competitor gap analysis, add 500+ words of topical depth.</td>
+                        </tr>
+                        <tr>
+                            <td><code>monitor</code></td>
+                            <td>18%</td>
+                            <td>Stable positions 1–3, healthy CTR, low volume</td>
+                            <td>No action required. Retain in automated monitoring.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Section 8: ML-12 Delivery Pack -->
+            <h2 class="section-heading"><span class="num">8.</span> Delivery & Communication Pack (ML-12)</h2>
+            
+            <div class="pack-card">
+                <h4>5-Minute Video Walkthrough Script</h4>
+                <ol>
+                    <li><strong>0:00 - 1:00 (The Problem):</strong> The 30,000-page enterprise catalog dilemma and empirical failure of the naive 180-day staleness heuristic.</li>
+                    <li><strong>1:00 - 2:00 (Data Contract):</strong> Pre-decision feature engineering, leakage prevention, and client isolation.</li>
+                    <li><strong>2:00 - 3:00 (Model & Validation):</strong> Evaluating on 7 unseen enterprise clients, showing +40.0% lift over baseline.</li>
+                    <li><strong>3:00 - 4:00 (Action Playbook):</strong> Translating probabilities into 4 clear reason codes for writers.</li>
+                    <li><strong>4:00 - 5:00 (Limitations & Impact):</strong> Human-in-the-loop boundaries and non-causal decision support.</li>
+                </ol>
+            </div>
+
+            <div class="pack-card">
+                <h4>Social Post Cut (LinkedIn / X)</h4>
+                <p>
+                    🚀 <em>Why the "refresh old content" rule wastes hundreds of editorial hours:</em><br><br>
+                    Most SEO guides instruct teams to audit pages once they cross 180 days old. In our study of 30,000 enterprise search assets across 29 organizations, content age alone proved non-linear—older articles actually declined <strong>less</strong> often (47.1%) than catalog base rate (54.2%).<br><br>
+                    The real warning sign? <strong>Striking-distance ranking (positions 4–15) combined with sub-2% CTR on high-impression queries</strong>, where decay rates surge to <strong>62.7%</strong>.<br><br>
+                    By training an interpretable decision tree on pre-decision signals and validating strictly on unseen enterprise client holdouts, we achieved <strong>56.0% Precision@50</strong> (+40.0% lift over heuristic rules).
+                </p>
+            </div>
+
+            <div class="pack-card">
+                <h4>Employer-Facing 3-Sentence Summary</h4>
+                <p>
+                    <em>"Designed and deployed an end-to-end Machine Learning content triage system for a catalog of 30,000 enterprise search assets across 29 organizations, predicting traffic decay using pre-decision search console signals.<br>
+                    Enforced rigorous grouped-client holdout validation to prevent cross-domain data leakage, demonstrating a 56.0% Precision@50 and a +40.0% absolute lift over industry-standard heuristic baselines.<br>
+                    Translated probabilistic predictions into an operational editorial action playbook with human-in-the-loop governance and published a reproducible open-access research paper on GitHub Pages."</em>
+                </p>
+            </div>
+
+            <!-- Section 9: Acknowledgments -->
+            <h2 class="section-heading"><span class="num">9.</span> Acknowledgments & Data Credit</h2>
+            <p>
+                This research capstone was built as part of the FlyRank Machine Learning Internship Program. All underlying enterprise search console and performance datasets were provided by <strong><a href="https://flyrank.ai" target="_blank">FlyRank (https://flyrank.ai)</a></strong>.
+            </p>
+
+            <footer class="site-footer">
+                <p>
+                    Reproducible research artifacts, notebooks, and metric receipts available on <a href="https://github.com/25RA/flyrank-ml-internship" target="_blank">GitHub</a>.<br>
+                    Built with scikit-learn & Python 3.10. Data attribution: <a href="https://flyrank.ai" target="_blank">FlyRank</a>.
+                </p>
+            </footer>
+
+        </article>
+    </div>
+
+    <script>
+        function switchDoor(doorName) {
+            document.querySelectorAll('.perspective-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.door-panel').forEach(p => p.classList.remove('active'));
+
+            if (doorName === 'ml') {
+                document.querySelectorAll('.perspective-btn')[0].classList.add('active');
+                document.getElementById('door-ml').classList.add('active');
+            } else if (doorName === 'employer') {
+                document.querySelectorAll('.perspective-btn')[1].classList.add('active');
+                document.getElementById('door-employer').classList.add('active');
+            } else if (doorName === 'seo') {
+                document.querySelectorAll('.perspective-btn')[2].classList.add('active');
+                document.getElementById('door-seo').classList.add('active');
+            }
+        }
+    </script>
+</body>
+</html>
+
