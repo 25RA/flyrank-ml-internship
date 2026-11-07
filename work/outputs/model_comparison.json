@@ -1,0 +1,30 @@
+[
+  {
+    "Model": "Week-4 Heuristic Baseline",
+    "Precision@20": 0.4,
+    "Precision@50": 0.42,
+    "ROC-AUC": 0.528,
+    "Lift vs Baseline": "+0.0 pts"
+  },
+  {
+    "Model": "Logistic Regression",
+    "Precision@20": 0.65,
+    "Precision@50": 0.56,
+    "ROC-AUC": 0.537,
+    "Lift vs Baseline": "+14.0 pts"
+  },
+  {
+    "Model": "Decision Tree (d=3)",
+    "Precision@20": 0.7,
+    "Precision@50": 0.68,
+    "ROC-AUC": 0.591,
+    "Lift vs Baseline": "+26.0 pts"
+  },
+  {
+    "Model": "Random Forest (d=6)",
+    "Precision@20": 0.6,
+    "Precision@50": 0.62,
+    "ROC-AUC": 0.6,
+    "Lift vs Baseline": "+20.0 pts"
+  }
+]
